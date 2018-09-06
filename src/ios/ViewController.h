@@ -19,8 +19,12 @@
 @property (nonatomic, weak) id <ViewControllerDelegate> delegate;
 
 -(void) setCloseString:(NSString*)strClose;
--(void) setScaningString:(NSString*)strScaning;
+-(void) setScaningString:(NSString*)strScaning : (NSString*)fontSize;
 -(void) setCameraNum:(NSString*)strCameraNum;
+-(void) setFlashTimer:(NSString*)strTimer : (NSString*)strEnableFlash;
+-(void) isShowHideSwitchButton:(NSString*)strShow;
+-(void) setCustomImage:(NSString*)strImage;
+-(BOOL) validateUrl: (NSString *) candidate;
 
 @end
 

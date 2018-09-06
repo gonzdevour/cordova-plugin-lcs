@@ -23,6 +23,7 @@
         <resource-file src="src/ios/close_icon.png" />
         <resource-file src="src/ios/rectangular_icon.png" />
         <resource-file src="src/ios/camera_switch_icon.png" />
+	<resource-file src="src/ios/custom_image.png" />
         <resource-file src="src/ios/Scan.storyboard" />
         
         <preference name="CAMERA_USAGE_DESCRIPTION" default="This app needs camera access"/>
@@ -68,5 +69,6 @@
         <source-file src="src/android/close_icon.png" target-dir="res/drawable" />
         <source-file src="src/android/rectangular_icon.png" target-dir="res/drawable" />
         <source-file src="src/android/camera_switch_icon.png" target-dir="res/drawable" />
+	<source-file src="src/android/custom_image.png" target-dir="res/drawable" />
     </platform>
 </plugin>

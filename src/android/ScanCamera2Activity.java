@@ -36,6 +36,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.webkit.URLUtil;
+import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -82,6 +84,11 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
     private String m_strClose;
     private String m_strScaning;
     private String m_strCamera;
+    private String m_strScanFontSize;
+    private String m_strEnableFlash;
+    private String m_strShowSwitchBtn;
+    private String m_strCustomImage;
+    private float m_fScanFontSize;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,11 +101,21 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
             Log.d("ScanCamera2Activity","bundle is null");
             m_strScaning = "Scaning...";
             m_strCamera = "1";
+            m_strScanFontSize = "30";
+            m_strEnableFlash = "1";
+            m_strShowSwitchBtn = "1";
+            m_strCustomImage = "";
+            m_fScanFontSize = 30.0f;
         }
         else
         {
             m_strScaning = b.getString("key_scan", "Scaning ...");
             m_strCamera = b.getString("key_camera", "1");
+            m_strScanFontSize = b.getString("key_scan_fontsize", "30");
+            m_strEnableFlash = b.getString("key_enable_flash", "1");
+            m_strShowSwitchBtn = b.getString("key_show_switchbtn", "1");
+            m_strCustomImage = b.getString("key_custom_image", "");
+            m_fScanFontSize = Float.parseFloat(m_strScanFontSize);
         }
         //
 
@@ -118,9 +135,19 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
 
         ////////////////////////
         //add control UI
-        createRectangularView(fl);
+        if(m_strCustomImage.isEmpty()) {
+            createRectangularView(fl);
+        }
+        else if(URLUtil.isValidUrl(m_strCustomImage)) {
+            createWebImageView(fl);
+        }
+        else {
+            createCustomImageView(fl);
+        }
         createCloseButton(fl);
-        createSwitchButton(fl);
+        if (m_strShowSwitchBtn.equals("1")) {
+            createSwitchButton(fl);
+        }
 
         setContentView(fl);
         textView.setVisibility(DEBUG?View.VISIBLE:View.GONE);
@@ -151,6 +178,7 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
                          讀取LightCode
                          ************************/
                         String mainResult = "";
+                        /**/
                         mainResult = sdk.imageRecognition(img);
                         if(!mainResult.isEmpty()){
                             vibrator.vibrate(100);
@@ -166,6 +194,7 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
                             finish();
 
                         }
+
                         img.close();
                     }
                 }
@@ -315,6 +344,7 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
                 @Override
                 public void onConfigureFailed(CameraCaptureSession cameraCaptureSession) {
                     //Toast.makeText(ScanCamera2Activity.this, "相機開啟失敗", Toast.LENGTH_SHORT).show();
+                    Log.d("asdf","camera config error");
                     setResult(RESULT_FIRST_USER);
                     finish();
                 }
@@ -450,7 +480,7 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
         tv.setText(m_strScaning);
         //////////////////
         //Set scaning text color and size
-        tv.setTextSize(30.0f);
+        tv.setTextSize(m_fScanFontSize);
         tv.setTextColor(Color.WHITE);
         //
         RelativeLayout.LayoutParams params3 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -461,15 +491,129 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
             tv.setId(View.generateViewId());
         }
         rl.addView(tv);
-        //blink animation
-        Animation anim = new AlphaAnimation(0.0f, 1.0f);
-        anim.setDuration(500); //You can manage the time of the blink with this parameter
-        anim.setStartOffset(20);
-        anim.setRepeatMode(Animation.REVERSE);
-        anim.setRepeatCount(Animation.INFINITE);
-        tv.startAnimation(anim);
+
+        if (m_strEnableFlash.equals("1")) {
+            //blink animation
+            Animation anim = new AlphaAnimation(0.0f, 1.0f);
+            anim.setDuration(500); //You can manage the time of the blink with this parameter
+            anim.setStartOffset(20);
+            anim.setRepeatMode(Animation.REVERSE);
+            anim.setRepeatCount(Animation.INFINITE);
+            tv.startAnimation(anim);
+        }
 
         //
         fl.addView(rl, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    private void createCustomImageView(FrameLayout fl) {
+        //create layout
+        FrameLayout subfl = new FrameLayout(this);
+
+        //get icon stream
+        String resName = m_strCustomImage.substring(0, m_strCustomImage.lastIndexOf("."));
+        InputStream rectIms = getResources().openRawResource(getResources().getIdentifier(resName,"drawable",getPackageName()));
+        // load image as Drawable
+        Drawable rectDraw = Drawable.createFromStream(rectIms, null);
+        // set image to ImageView
+        ImageView rectView = new ImageView(this);
+        rectView.setImageDrawable(rectDraw);
+        rectView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        //
+        Rect rc = new Rect();
+        getWindow().getDecorView().getWindowVisibleDisplayFrame(rc);
+        //
+        FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        //////////////
+        //Set image view width and height => params2.width params2.height
+        //Poistion is center in parent
+        params2.width = rc.width();
+        params2.height = rc.height();
+        rectView.setLayoutParams(params2);
+        subfl.addView(rectView);
+
+        //create result view
+        TextView tv = new TextView(this);
+        tv.setText(m_strScaning);
+        //////////////////
+        //Set scaning text color and size
+        tv.setTextSize(m_fScanFontSize);
+        tv.setTextColor(Color.WHITE);
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        //
+        FrameLayout.LayoutParams params3 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params3.width = rc.width();
+        params3.setMargins(0,rc.height()*3/4,0,0);
+        tv.setLayoutParams(params3);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            tv.setId(View.generateViewId());
+        }
+        subfl.addView(tv);
+
+        if (m_strEnableFlash.equals("1")) {
+            //blink animation
+            Animation anim = new AlphaAnimation(0.0f, 1.0f);
+            anim.setDuration(500); //You can manage the time of the blink with this parameter
+            anim.setStartOffset(20);
+            anim.setRepeatMode(Animation.REVERSE);
+            anim.setRepeatCount(Animation.INFINITE);
+            tv.startAnimation(anim);
+        }
+
+        //
+        fl.addView(subfl, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    private void createWebImageView(FrameLayout fl) {
+        //create layout
+        FrameLayout subfl = new FrameLayout(this);
+
+        // set web view to custom image
+        WebView rectView = new WebView(this);
+        rectView.setBackgroundColor(Color.BLACK);
+        rectView.loadUrl(m_strCustomImage);
+        //
+        Rect rc = new Rect();
+        getWindow().getDecorView().getWindowVisibleDisplayFrame(rc);
+        //
+        FrameLayout.LayoutParams params2 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        //////////////
+        //Set image view width and height => params2.width params2.height
+        //Poistion is center in parent
+        params2.width = rc.width();
+        params2.height = rc.height();
+        rectView.setLayoutParams(params2);
+        subfl.addView(rectView);
+
+        //create result view
+        TextView tv = new TextView(this);
+        tv.setText(m_strScaning);
+        //////////////////
+        //Set scaning text color and size
+        tv.setTextSize(m_fScanFontSize);
+        tv.setTextColor(Color.WHITE);
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        //
+        FrameLayout.LayoutParams params3 = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params3.width = rc.width();
+        params3.setMargins(0,rc.height()*3/4,0,0);
+        tv.setLayoutParams(params3);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            tv.setId(View.generateViewId());
+        }
+        subfl.addView(tv);
+
+        if (m_strEnableFlash.equals("1")) {
+            //blink animation
+            Animation anim = new AlphaAnimation(0.0f, 1.0f);
+            anim.setDuration(500); //You can manage the time of the blink with this parameter
+            anim.setStartOffset(20);
+            anim.setRepeatMode(Animation.REVERSE);
+            anim.setRepeatCount(Animation.INFINITE);
+            tv.startAnimation(anim);
+        }
+
+        //
+        fl.addView(subfl, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 }

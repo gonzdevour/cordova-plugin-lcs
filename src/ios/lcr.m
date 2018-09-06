@@ -30,18 +30,25 @@ CDVInvokedUrlCommand *scanCommand = nil;
     NSString* strClose = [[scanCommand arguments] objectAtIndex:0];
     NSString* strScaning = [[scanCommand arguments] objectAtIndex:1];
     NSString* numCamera = [[scanCommand arguments] objectAtIndex:2];
-    NSLog(@"Command arguments are %@ , %@, %@",strClose, strScaning, numCamera);
+    NSString* strScanFontSize = [[scanCommand arguments] objectAtIndex:3];
+    NSString* scaningFlash = [[scanCommand arguments] objectAtIndex:4];
+    NSString* customImage = [[scanCommand arguments] objectAtIndex:5];
+    NSString* showSwitchBtn = [[scanCommand arguments] objectAtIndex:6];
+    NSLog(@"Command arguments are %@ , %@, %@, %@, %@, %@, %@",strClose, strScaning, numCamera, strScanFontSize, scaningFlash, customImage, showSwitchBtn);
     //
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Scan" bundle:nil];
     vc = [storyboard instantiateViewControllerWithIdentifier:@"ViewController"];
     vc.delegate = self;
     [vc setCameraNum:numCamera];
+    [vc setFlashTimer:@"0.8" : scaningFlash];
     //
     [self.viewController addChildViewController:vc];
     [self.webView addSubview:vc.view];
     //
     [vc setCloseString:strClose];
-    [vc setScaningString:strScaning];
+    [vc setScaningString:strScaning:strScanFontSize];
+    [vc isShowHideSwitchButton:showSwitchBtn];
+    [vc setCustomImage:customImage];
 }
 
 

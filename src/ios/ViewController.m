@@ -16,8 +16,17 @@
     __weak IBOutlet UIView *scanView;
     __weak IBOutlet UILabel *resultView;
     __weak IBOutlet UIButton *cancelButton;
+    __weak IBOutlet UIButton *switchButton;
+    __weak IBOutlet UIImageView *customImageView;
+    __weak IBOutlet UIWebView *customWebIMageView;
     
+    NSString *strScan;
+    float scanFontSize;
     int camera_num;
+    double flash_timeer;
+    Boolean bEnableFlash;
+    Boolean bSwitchButtonShowHide;
+    NSString *strCustomImage;
 }
 
 @end
@@ -90,11 +99,18 @@
     [previewLayer setPosition:CGPointMake(CGRectGetMidX(bounds), CGRectGetMidY(bounds))];
     [scanView.layer addSublayer:previewLayer];
     //
-    [resultView setText:[NSString stringWithFormat:@"Scaning ..."]];
-    resultView.alpha = 1;
-    [UIView animateWithDuration:0.8 delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
-        resultView.alpha = 0;
-    } completion:nil];
+    if (bEnableFlash && flash_timeer != 0.0) {
+        if (strScan == NULL) {
+            [resultView setText:[NSString stringWithFormat:@"Scaning ..."]];
+        }
+        else {
+            [resultView setText:strScan];
+        }
+        resultView.alpha = 1;
+        [UIView animateWithDuration:flash_timeer delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
+            resultView.alpha = 0;
+        } completion:nil];
+    }
 }
 
 - (void)setVideoOutput{
@@ -117,10 +133,12 @@
     
 }
 
--(void) setScaningString:(NSString *)strScaning {
-    NSString* temp = [NSString stringWithFormat:@"%@", strScaning];
+-(void) setScaningString:(NSString *)strScaning :(NSString*)fontSize {
+    strScan = [NSString stringWithFormat:@"%@", strScaning];
+    scanFontSize = [fontSize floatValue];
     //[resultView.layer removeAllAnimations];
-    [resultView setText:temp];
+    [resultView setText:strScan];
+    [resultView setFont:[UIFont systemFontOfSize:scanFontSize]];
     [resultView setNeedsDisplay];
 }
 
@@ -132,7 +150,64 @@
     }
     NSLog(@"setCameraNum %@, %d", strCameraNum , camera_num);
 }
+
+-(void) setFlashTimer:(NSString*)strTimer : (NSString*)strEnableFlash {
+    bEnableFlash = true;
+    NSString* temp = [NSString stringWithFormat:@"%@", strEnableFlash];
+    if ([temp isEqual:@"0"]) {
+        bEnableFlash = false;
+    }
+    flash_timeer = [strTimer doubleValue];
+    NSLog(@"setFlashTimer %@, %f", strTimer , flash_timeer);
+}
+
+-(void) isShowHideSwitchButton:(NSString*)strShow {
     
+    NSLog(@"isShowHideSwitchButton %@", strShow);
+    
+    NSString* temp = [NSString stringWithFormat:@"%@", strShow];
+    if ([temp isEqual:@"0"]) {
+        bSwitchButtonShowHide = false;
+        switchButton.enabled = false;
+        switchButton.hidden = true;
+    }
+    else {
+        bSwitchButtonShowHide = true;
+    }
+}
+
+-(void) setCustomImage:(NSString *)strImage {
+    strCustomImage = [NSString stringWithFormat:@"%@", strImage];
+    NSLog(@"setCustomImage %@", strCustomImage);
+    if ([strCustomImage length] == 0) {
+        //[customImageView setHidden:TRUE];
+        customImageView.hidden = TRUE;
+        customWebIMageView.hidden = TRUE;
+    }
+    else if([self validateUrl:strCustomImage]) {
+        customImageView.hidden = TRUE;
+        customWebIMageView.hidden = FALSE;
+        NSURL *url = [NSURL URLWithString:strCustomImage];
+        NSURLRequest *request = [NSURLRequest requestWithURL:url];
+        [customWebIMageView loadRequest:request];
+    }
+    else {
+        customImageView.image = [UIImage imageNamed:strCustomImage];
+    }
+}
+
+- (BOOL) validateUrl: (NSString *) candidate {
+    /*
+    NSString *urlRegEx =
+    @"(http|https)://((\\w)*|([0-9]*)|([-|_])*)+([\\.|/]((\\w)*|([0-9]*)|([-|_])*))+";
+    NSPredicate *urlTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", urlRegEx];
+    return [urlTest evaluateWithObject:candidate];
+     */
+    if ([candidate containsString:@"http"]) {
+        return TRUE;
+    }
+    return FALSE;
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
