@@ -11,7 +11,7 @@
 #import <AVFoundation/AVFoundation.h>
 
 @interface LightCodeOOKLibrary : NSObject
-- (AVCaptureSession*)LCcameraControl:(AVCaptureSession*) mycaptureSession:(int)cameraLocation;
+- (AVCaptureSession*)LCcameraControl:(AVCaptureSession*) mycaptureSession cameraLocation:(int)cameraLocation;
 -(void)LCcameraClean;
 -(NSString *)readLC:(CMSampleBufferRef)sampleBuffer;
 @end
