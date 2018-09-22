@@ -39,7 +39,7 @@
     // init libOCC
     lib = [[LightCodeOOKLibrary alloc]init];
     //init captureSession
-    captureSession = [lib LCcameraControl:captureSession:camera_num];
+    captureSession = [lib LCcameraControl:captureSession cameraLocation:camera_num];
     
     if(captureSession != NULL){
         //Add outputStream to captureSession
@@ -232,7 +232,7 @@
         //切換成後鏡頭
         camera_num=1;
     }
-    captureSession = [lib LCcameraControl:captureSession :camera_num];
+    captureSession = [lib LCcameraControl:captureSession cameraLocation:camera_num];
     if(captureSession != NULL){
         //Add outputStream to captureSession
         [self setVideoOutput];
