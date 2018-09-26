@@ -187,12 +187,15 @@
     else if([self validateUrl:strCustomImage]) {
         customImageView.hidden = TRUE;
         customWebIMageView.hidden = FALSE;
+		scanView.hidden = TRUE;
         NSURL *url = [NSURL URLWithString:strCustomImage];
         NSURLRequest *request = [NSURLRequest requestWithURL:url];
         [customWebIMageView loadRequest:request];
     }
     else {
         customImageView.image = [UIImage imageNamed:strCustomImage];
+		customWebIMageView.hidden = TRUE;
+		scanView.hidden = TRUE;
     }
 }
 

@@ -128,7 +128,15 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
 
         ll.addView(textView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-        fl.addView(mSurfaceView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        //
+        int surfaceView_W = ViewGroup.LayoutParams.MATCH_PARENT;
+        int surfaceView_H = ViewGroup.LayoutParams.MATCH_PARENT;
+        if(!m_strCustomImage.isEmpty()) {
+            surfaceView_W = 1;
+            surfaceView_H = 1;
+        }
+        fl.addView(mSurfaceView, new FrameLayout.LayoutParams(surfaceView_W, surfaceView_H));
+        
         fl.addView(ll, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
         textView.setText("result text");
@@ -250,13 +258,29 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
         //set resolution
         StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
         Size[] outputSizes = map.getOutputSizes(SurfaceTexture.class);
+        /**
+         * 調整畫面解析度
+         * 須針對Zenfone 5進行特化
+         */
         boolean FINDHD = false;
+        String deviceModel = Build.MODEL;
         for(int i=0;i< outputSizes.length;i++){
-            if(outputSizes[i].getHeight() == 1080 && outputSizes[i].getWidth()==1920){
-                mPreviewSize = outputSizes[i];
-                FINDHD = true;
-                break;
+            if(deviceModel.equals("ASUS_X00QD")){
+                //針對Zenfone 5進行優化
+                if(outputSizes[i].getHeight() == 2160 && outputSizes[i].getWidth()==3840){
+                    mPreviewSize = outputSizes[i];
+                    FINDHD = true;
+                    break;
+                }
             }
+            else{
+                if(outputSizes[i].getHeight() == 1080 && outputSizes[i].getWidth()==1920){
+                    mPreviewSize = outputSizes[i];
+                    FINDHD = true;
+                    break;
+                }
+            }
+
         }
         if(!FINDHD)
             mPreviewSize = outputSizes[0];
@@ -323,8 +347,12 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
                         /****************************
                         設定相機相關參數
                         呼叫Light Code API 設定相機參數
+                         @para1: 相機Builder
+                         @para2: 相機參數
+                         @para3; 開啟相機鏡頭的位置。 0:前鏡頭 1:後鏡頭
+                         @return: 相機Builder
                          ****************************/
-                        mPreviewBuilder = sdk.Camera2LCCamera(mPreviewBuilder, characteristics);
+                        mPreviewBuilder = sdk.Camera2LCCamera(mPreviewBuilder, characteristics, 1);
                         if(mPreviewBuilder==null){
                             Log.d("asdf","this camera not support");
                             //
