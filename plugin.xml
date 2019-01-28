@@ -34,6 +34,7 @@
 	<resource-file src="src/ios/cp7.jpg" />
 	<resource-file src="src/ios/cp8.jpg" />
 	<resource-file src="src/ios/cp9.jpg" />
+	<resource-file src="src/ios/cp10.jpg" />
         <resource-file src="src/ios/Scan.storyboard" />
         
         <preference name="CAMERA_USAGE_DESCRIPTION" default="This app needs camera access"/>
@@ -90,5 +91,6 @@
 	<source-file src="src/android/cp7.jpg" target-dir="res/drawable" />
 	<source-file src="src/android/cp8.jpg" target-dir="res/drawable" />
 	<source-file src="src/android/cp9.jpg" target-dir="res/drawable" />
+	<source-file src="src/android/cp10.jpg" target-dir="res/drawable" />
     </platform>
 </plugin>
