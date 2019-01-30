@@ -260,14 +260,13 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
         Size[] outputSizes = map.getOutputSizes(SurfaceTexture.class);
         /**
          * 調整畫面解析度
-         * 須針對Zenfone進行特化
+         * 須針對Zenfone 5進行特化
          */
         boolean FINDHD = false;
         String deviceModel = Build.MODEL;
-        int ModelSDK = Build.VERSION.SDK_INT;
         for(int i=0;i< outputSizes.length;i++){
-            if(ModelSDK >= 24 && deviceModel.contains("ASUS")){
-                //針對Zenfone 進行優化
+            if(deviceModel.equals("ASUS_X00QD")){
+                //針對Zenfone 5進行優化
                 if(outputSizes[i].getHeight() == 2160 && outputSizes[i].getWidth()==3840){
                     mPreviewSize = outputSizes[i];
                     FINDHD = true;
@@ -281,6 +280,7 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
                     break;
                 }
             }
+
         }
         if(!FINDHD)
             mPreviewSize = outputSizes[0];
