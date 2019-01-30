@@ -258,33 +258,39 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
         //set resolution
         StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
         Size[] outputSizes = map.getOutputSizes(SurfaceTexture.class);
-        /**
-         * 調整畫面解析度
-         * 須針對Zenfone進行特化
-         */
         boolean FINDHD = false;
         String deviceModel = Build.MODEL;
         int ModelSDK = Build.VERSION.SDK_INT;
         for(int i=0;i< outputSizes.length;i++){
-            if(ModelSDK >= 24 && deviceModel.contains("ASUS")){
-                //針對Zenfone 進行優化
-                if(outputSizes[i].getHeight() == 2160 && outputSizes[i].getWidth()==3840){
-                    mPreviewSize = outputSizes[i];
-                    FINDHD = true;
-                    break;
+            //針對Zenfone 進行優化
+            if(ModelSDK >= 26 && deviceModel.contains("ASUS")){
+                //後鏡頭
+                if(cameraPos==1){
+                    if(outputSizes[i].getHeight() == 2160 && outputSizes[i].getWidth()==3840){
+                        mPreviewSize = outputSizes[i];
+                        FINDHD = true;
+                        break;
+                    }
+                }
+                //前鏡頭
+                else{
+                    if(outputSizes[i].getHeight() == 1080 && outputSizes[i].getWidth()==1920){
+                        mPreviewSize = outputSizes[i];
+                        FINDHD = true;
+                        break;
+                    }
                 }
             }
-            else{
-                if(outputSizes[i].getHeight() == 1080 && outputSizes[i].getWidth()==1920){
-                    mPreviewSize = outputSizes[i];
-                    FINDHD = true;
-                    break;
-                }
+            //其餘手機
+            else if(outputSizes[i].getHeight() == 1080 && outputSizes[i].getWidth()==1920){
+                mPreviewSize = outputSizes[i];
+                FINDHD = true;
+                break;
             }
         }
         if(!FINDHD)
             mPreviewSize = outputSizes[0];
-        Log.d(TAG,"support setting previewSize "+mPreviewSize.getWidth()+"x"+mPreviewSize.getHeight());
+        Log.d(TAG, "support setting previewSize " + mPreviewSize.getWidth() + "x" + mPreviewSize.getHeight());
 
         //Set image reader
         mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 2);
