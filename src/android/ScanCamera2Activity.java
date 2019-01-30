@@ -265,7 +265,7 @@ public class ScanCamera2Activity extends Activity implements SurfaceHolder.Callb
             //針對Zenfone 進行優化
             if(ModelSDK >= 26 && deviceModel.contains("ASUS")){
                 //後鏡頭
-                if(cameraPos==1){
+                if(m_strCamera.equals("1")){
                     if(outputSizes[i].getHeight() == 2160 && outputSizes[i].getWidth()==3840){
                         mPreviewSize = outputSizes[i];
                         FINDHD = true;
