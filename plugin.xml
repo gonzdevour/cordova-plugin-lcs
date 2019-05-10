@@ -77,6 +77,7 @@
         <source-file src="src/android/LightCodeRecognition.jar" target-dir="libs" />
 		<source-file src="src/android/armeabi/libMyOpencvLibs.so" target-dir="libs/armeabi" />
 		<source-file src="src/android/armeabi-v7a/libMyOpencvLibs.so" target-dir="libs/armeabi-v7a" />
+		<source-file src="src/android/arm64-v8a/libMyOpencvLibs.so" target-dir="libs/arm64-v8a" />
 		<framework src="src/android/plugin.gradle" custom="true" type="gradleReference"/>
         <source-file src="src/android/close_icon.png" target-dir="res/drawable" />
         <source-file src="src/android/rectangular_icon.png" target-dir="res/drawable" />
